@@ -42,7 +42,7 @@ RCT_EXPORT_METHOD(trigger:(NSString *)type enableVibrateFallback:(BOOL)enableVib
 
     } else if ([self supportsHapticFor6SAnd6SPlus]) {
         // generates alternative haptic feedback
-        printf("hello iphone6s");
+        // printf("hello iphone6s");
         if ([type isEqual: @"selection"]) {
             AudioServicesPlaySystemSound((SystemSoundID) 1519);
         } else if ([type isEqual: @"impactMedium"]) {
