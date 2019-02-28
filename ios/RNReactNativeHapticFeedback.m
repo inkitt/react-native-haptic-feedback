@@ -24,7 +24,6 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(trigger:(NSString *)type enableVibrateFallback:(BOOL)enableVibrateFallback)
 {
     if ([self supportsHaptic]){
-        
         if ([type isEqual: @"impactLight"]) {
             [self generateImpactFeedback:UIImpactFeedbackStyleLight];
         } else if ([type isEqual:@"impactMedium"]) {
@@ -40,17 +39,27 @@ RCT_EXPORT_METHOD(trigger:(NSString *)type enableVibrateFallback:(BOOL)enableVib
         } else {
             [self generateSelectionFeedback];
         }
-        
-    } else if (enableVibrateFallback) {
+
+    } else if ([self supportsHapticFor6SAnd6SPlus]) {
+        // generates alternative haptic feedback
+        printf("hello iphone6s");
+        if ([type isEqual: @"selection"]) {
+            AudioServicesPlaySystemSound((SystemSoundID) 1519);
+        } else if ([type isEqual: @"impactMedium"]) {
+            AudioServicesPlaySystemSound((SystemSoundID) 1520);
+        } else if ([type isEqual:@"notificationWarning"]) {
+            AudioServicesPlaySystemSound((SystemSoundID) 1521);
+        }
+
+    }else if (enableVibrateFallback) {
         AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
     }
-    
+
 }
 
 -(Boolean)supportsHaptic {
     return [[UIDevice currentDevice] systemVersion].floatValue >= 10.0
-        && ![[DeviceUtils platform] isEqualToString:@"iPhone8,4"] // iPhone SE
-        && [DeviceUtils deviceVersion:@"iPhone"] > 7;
+        && [DeviceUtils deviceVersion:@"iPhone"] > 8;
 }
 
 -(void)generateSelectionFeedback{
@@ -72,6 +81,12 @@ RCT_EXPORT_METHOD(trigger:(NSString *)type enableVibrateFallback:(BOOL)enableVib
     [generator prepare];
     [generator notificationOccurred:notificationType];
     generator = nil;
+}
+
+-(Boolean)supportsHapticFor6SAnd6SPlus {
+	    return [[UIDevice currentDevice] systemVersion].floatValue >= 10.0
+	        && ([[DeviceUtils platform] isEqualToString:@"iPhone8,1"]  // iPhone 6S
+	        || [[DeviceUtils platform] isEqualToString:@"iPhone8,2"]); // iPhone 6S Plus
 }
 
 
